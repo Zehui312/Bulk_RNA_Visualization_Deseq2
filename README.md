@@ -43,42 +43,43 @@ Required columns:
 
 Optional:
 
-- `Compare*` columns (e.g. `Compare1`, `Compare2`) for defining comparisons. You can add Compare3...
-
----
-
-### 2. BAM files
-
-- Sorted BAM files
-- Must match `Sample_ID`
-
----
+- `Compare*` columns (e.g. `Compare1`, `Compare2`) for defining comparisons. You can add `Compare3...`
 
 
 
-## 🚀 Usage
+## 🚀 4. Usage
 
-### Step 1: Run pipeline
+After filling the **meta_data.csv**, and you can run this pipeline. 
 
 ```bash
 bash Run_Deseq2_pipeline.sh
 ```
 
 ## 📊 Output
-├── 1_feature_count
-│   ├── JB251030_gene.count
-│   ├── JB251030_gene.count.summary
-│   └── rename_JB251030_gene.count
-└── 2_deseq2
+
+
+The pipeline generates the following output structure:
+
+```
+├── 1_feature_count/
+│   ├── {sample}_gene.count
+│   ├── {sample}_gene.count.summary
+│   └── rename_{sample}_gene.count
+└── 2_deseq2/
     ├── 0_gff_annotation.csv
-    ├── 1_PCA_JB251030.pdf
-    ├── P_vs_F1
-    │   ├── 1_DESeq2_results_P_vs_F1.csv
-    │   ├── 2_DESeq2_diff_genes_P_vs_F1.csv
-    │   ├── 3_DESeq2_normalized_counts_P_vs_F1.csv
-    │   └── P_vs_F1.pdf
-    ├── P_vs_F2
-    │   ├── 1_DESeq2_results_P_vs_F2.csv
-    │   ├── 2_DESeq2_diff_genes_P_vs_F2.csv
-    │   ├── 3_DESeq2_normalized_counts_P_vs_F2.csv
-    │   └── P_vs_F2.pdf
+    ├── 1_PCA_{sample}.pdf
+    ├── {comparison1}/
+    │   ├── 1_DESeq2_results_{comparison1}.csv
+    │   ├── 2_DESeq2_diff_genes_{comparison1}.csv
+    │   ├── 3_DESeq2_normalized_counts_{comparison1}.csv
+    │   └── {comparison1}.pdf
+    └── {comparison2}/
+        ├── 1_DESeq2_results_{comparison2}.csv
+        ├── 2_DESeq2_diff_genes_{comparison2}.csv
+        ├── 3_DESeq2_normalized_counts_{comparison2}.csv
+        └── {comparison2}.pdf
+```
+
+**Key outputs:**
+- `1_feature_count/` - Raw feature counts
+- `2_deseq2/` - DESeq2 results, PCA plots, and volcano plots for each comparison

@@ -62,16 +62,16 @@ write.csv(gff_frame, "0_gff_annotation.csv", row.names = FALSE)
 #+++++++++++++++++++++++Step 0-2 user-defined functions ++++++++++
 #=================================================================
 # Function to create volcano plot
-create_volcano_plot <- function(res_gff, group1, group2, cutoff_fc = 1.8) {
+create_volcano_plot <- function(res_gff, group1, group2, cutoff_fc = log2fc_cutoff) {
     df <- res_gff
     volcano_name <- paste0(group1, "_vs_", group2)
     
     # Add significance column
     df$significance <- "No"
-    df$significance[df$padj < 0.05 & df$log2FoldChange > cutoff_fc] <- "Up"
-    df$significance[df$padj < 0.05 & df$log2FoldChange < -cutoff_fc] <- "Down"
+    df$significance[df$padj < padj_cutoff & df$log2FoldChange > cutoff_fc] <- "Up"
+    df$significance[df$padj < padj_cutoff & df$log2FoldChange < -cutoff_fc] <- "Down"
     df$label <- ifelse(df$padj < 0.01 & abs(df$log2FoldChange) > cutoff_fc, df$gene, NA)
-    diff_gene_count <- nrow(subset(df, df$padj < 0.05 & abs(df$log2FoldChange) > cutoff_fc))
+    diff_gene_count <- nrow(subset(df, df$padj < padj_cutoff & abs(df$log2FoldChange) > cutoff_fc))
     print(paste0("Number of differentially expressed genes between ", group1, " and ", group2, ": ", diff_gene_count))
     highlight_points <- subset(df, df$padj < 0.01 & abs(df$log2FoldChange) > cutoff_fc)
     max_padj <- max(-log10(df$padj[is.finite(-log10(df$padj))]))
@@ -81,7 +81,7 @@ create_volcano_plot <- function(res_gff, group1, group2, cutoff_fc = 1.8) {
         geom_point(data = highlight_points, aes(x = log2FoldChange, y = -log10(padj)),
                              size = 4, alpha = 0.5, shape = 21, stroke = 2) +
         geom_vline(xintercept = c(-cutoff_fc, cutoff_fc), linetype = "dashed", color = "black") +
-        geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "gray50") +
+        geom_hline(yintercept = -log10(padj_cutoff), linetype = "dashed", color = "gray50") +
         geom_text_repel(aes(label = label),
                                         size = 4,
                                         max.overlaps = 10,
@@ -98,7 +98,7 @@ create_volcano_plot <- function(res_gff, group1, group2, cutoff_fc = 1.8) {
             legend.text = element_text(size = 14)
         ) +
         labs(
-            title = paste0(volcano_name, ": labeling Padj < 0.05 and |log2FC| > ", cutoff_fc),
+            title = paste0(volcano_name, ": labeling Padj < ", padj_cutoff, " and |log2FC| > ", cutoff_fc),
             subtitle = paste0("Number of differentially expressed genes: ", diff_gene_count),
             x = "log2(Fold Change)",
             y = "-log10(Adjusted P-value)",
